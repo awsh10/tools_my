@@ -1,0 +1,6 @@
+my_dictionary/__pycache__/
+.idea/
+my_dictionary/migrations/__pycache__/
+my_english_site/__pycache__/
+db.sqlite3
+admin.py
