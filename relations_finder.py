@@ -19,9 +19,11 @@ def bord_create_func(path, board_size=10000, elements_max=None):
     :param elements_max: max quantity of elements in a subboard
     :return:
     """
+    global goriz
     remove_files_from_folder_func(path + '*')
     if not elements_max:
         elements_max = board_size
+
     goriz = [str(g) for g in range(board_size)]
     # board = [v + g for v in vertic for g in goriz]
     elements_total = board_size ** 2
@@ -57,11 +59,11 @@ def bord_create_func(path, board_size=10000, elements_max=None):
 def fields_rest_func(field, fields_set):
     """ Creates new rest list of free fields for the given field.  Finds diagonal, vertical and gorizontal fields
         binded with this field and subtracts them from the input board_rest_set """
+    vertic_value, sep, goriz_value = field.partition(':')
+    print(field, vertic_value, goriz_value)
 
-
-
-    goriz_start = goriz.index(field[1])
-    vertic_start = vertic.index(field[0])
+    goriz_start = goriz.index(goriz_value)
+    vertic_start = vertic.index(vertic_value)
 
     goriz_left = goriz[:goriz_start]
     goriz_right = goriz[goriz_start + 1:]
@@ -155,6 +157,8 @@ if __name__ == '__main__':
     import timeit
     from tools_my import convert_to_exponent_float
     board_size = 4
+    vertic = [str(v) for v in range(board_size - 1, -1, -1)]
+    board = [v + ':' + g for v in vertic for g in goriz]
     elements_max = None
     # time_total = timeit.timeit('board_func({}, {})'.format(board_size, elements_max), setup='from __main__ import board_func', number=1)
     # time_creating_element = time_total / (board_size * board_size)
