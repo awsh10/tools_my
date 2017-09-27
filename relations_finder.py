@@ -20,16 +20,6 @@ def bord_create_func(path, board_size=10000, elements_max=None):
     :return:
     """
     global goriz
-    remove_files_from_folder_func(path + '*')
-    if not elements_max:
-        elements_max = board_size
-
-    goriz = [str(g) for g in range(board_size)]
-    # board = [v + g for v in vertic for g in goriz]
-    elements_total = board_size ** 2
-    lines_count = elements_max // board_size
-    int_part = board_size // lines_count
-    rest = board_size % lines_count
 
     len_board = 0
     def vert_board_func(value_max, value_min, iteration):
@@ -45,7 +35,19 @@ def bord_create_func(path, board_size=10000, elements_max=None):
             pickle.dump(board, file_my, pickle.HIGHEST_PROTOCOL)
         return board
 
-    if rest:
+    remove_files_from_folder_func(path + '*')
+
+    if not elements_max:
+        elements_max = board_size
+
+    goriz = [str(g) for g in range(board_size)]
+    # board = [v + g for v in vertic for g in goriz]
+    elements_total = board_size ** 2
+    lines_count = elements_max // board_size
+    int_part = board_size // lines_count
+    rest = board_size % lines_count
+
+    if rest: #TODO: it's necessary to verify this code
         value_max = board_size - 1
         value_min = board_size - rest - 1
         board = vert_board_func(value_max, value_min)
@@ -151,7 +153,7 @@ def main_func(board_size = 8, elements_max=None):
             'time_exec': '{:.3g}'.format(time_exec)}
 
     print(len_board)
-#TODO: inserting data to files
+#TODO: inserting data to files during recurtion. goriz and vertic - to files?
 
 if __name__ == '__main__':
     import timeit
