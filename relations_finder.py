@@ -3,10 +3,10 @@ from time import time
 import os
 import glob
 
-# vertic = [str(v) for v in range(max_ - 1, -1, -1)]
-# board = [v + ':' + g for v in vertic for g in goriz]
-goriz = []
-vertic = []
+# vertical = [str(v) for v in range(max_ - 1, -1, -1)]
+# board = [v + ':' + g for v in vertical for g in horizontal]
+horizontal = []
+vertical = []
 def remove_files_from_folder_func(path):
     files = glob.glob(path)
     for f in files:
@@ -19,17 +19,17 @@ def bord_create_func(path, board_size=10000, elements_max=None):
     :param elements_max: max quantity of elements in a subboard
     :return:
     """
-    global goriz
+    global horizontal
 
     len_board = 0
     def vert_board_func(value_max, value_min, iteration):
         """
-        The function creates subboard from value_max to value_min of the vertical and all values of the gorizontal,
+        The function creates subboard from value_max to value_min of the vertical and all values of the horizontal,
         and inserts the subboard to a file with a special name
         """
         nonlocal len_board
-        vertic_part = [str(v) for v in range(value_max, value_min, -1)]
-        board = [v + ':' + g for v in vertic_part for g in goriz]
+        vertical_part = [str(v) for v in range(value_max, value_min, -1)]
+        board = [h + ':' + v for v in vertical_part for h in horizontal]
         # len_board += len(board )
         with open('{}{}.pkl'.format(path, iteration), 'wb') as file_my:
             pickle.dump(board, file_my, pickle.HIGHEST_PROTOCOL)
@@ -40,8 +40,8 @@ def bord_create_func(path, board_size=10000, elements_max=None):
     if not elements_max:
         elements_max = board_size
 
-    goriz = [str(g) for g in range(board_size)]
-    # board = [v + g for v in vertic for g in goriz]
+    horizontal = [str(h) for h in range(board_size)]
+    # board = [v + g for v in vertical for g in horizontal]
     elements_total = board_size ** 2
     lines_count = elements_max // board_size
     int_part = board_size // lines_count
@@ -59,31 +59,29 @@ def bord_create_func(path, board_size=10000, elements_max=None):
         board = vert_board_func(value_max, value_min, k - 1)
 
 def fields_rest_func(field, fields_set):
-    """ Creates new rest list of free fields for the given field.  Finds diagonal, vertical and gorizontal fields
+    """ Creates new rest list of free fields for the given field.  Finds diagonal, vertical and horizontal fields
         binded with this field and subtracts them from the input board_rest_set """
-    vertic_value, sep, goriz_value = field.partition(':')
-    print(field, vertic_value, goriz_value)
+    vertical_value, sep, horizontal_value = field.partition(':')
+    print(field, vertical_value, horizontal_value)
 
-    goriz_start = goriz.index(goriz_value)
-    vertic_start = vertic.index(vertic_value)
+    horizontal_start = horizontal.index(horizontal_value)
+    vertical_start = vertical.index(vertical_value)
 
-    goriz_left = goriz[:goriz_start]
-    goriz_right = goriz[goriz_start + 1:]
-    vertic_up = vertic[vertic_start + 1:]
-    vertic_down = vertic[:vertic_start]
-    goriz_left.reverse()
-    vertic_down.reverse()
+    horizontal_left = horizontal[:horizontal_start]
+    horizontal_right = horizontal[horizontal_start + 1:]
+    vertical_up = vertical[vertical_start + 1:]
+    vertical_down = vertical[:vertical_start]
 
-    fields_vertical_list = [v + field[1] for v in vertic if v != field[0]]
-    fields_gorizontal_list = [field[0] + g for g in goriz if g != field[1]]
+    fields_vertical_list = [v + field[1] for v in vertical if v != field[0]]
+    fields_horizontal_list = [field[0] + g for g in horizontal if g != field[1]]
 
-    diagonal_left_down = list(v + g for (v, g) in zip(vertic_down, goriz_left))
-    diagonal_rigt_down = list(v + g for (v, g) in zip(vertic_down, goriz_right))
-    diagonal_rigt_up = list(v + g for (v, g) in zip(vertic_up, goriz_right))
-    diagonal_left_up = list(v + g for (v, g) in zip(vertic_up, goriz_left))
+    diagonal_left_down = list(h + v for (v, h) in zip(vertical_down, reversed(horizontal_left)))
+    diagonal_rigt_down = list(h + v for (v, h) in zip(vertical_down, horizontal_right))
+    diagonal_rigt_up = list(h + v for (v, h) in zip(reversed(vertical_up), horizontal_right))
+    diagonal_left_up = list(h + v for (v, h) in zip(reversed(vertical_up), reversed(horizontal_left)))
 
     total_fields_list = (diagonal_rigt_down + diagonal_left_down + diagonal_rigt_up + diagonal_left_up +
-                         fields_vertical_list + fields_gorizontal_list + [field])
+                         fields_vertical_list + fields_horizontal_list + [field])
 
     fields_rest_set = fields_set.difference(set(total_fields_list))
 
@@ -143,7 +141,8 @@ def main_func(board_size = 8, elements_max=None):
     path = './board/'
     bord_create_func(path, board_size)
     time_func_board = time() - start
-    point_func(fields_set_path=path, level=0)
+    # return
+    # point_func(fields_set_path=path, level=0)
     time_func_point = time() - time_func_board
     time_exec = time_func_board + time_func_point
     time_creating_element = time_func_board / board_size / board_size
@@ -153,23 +152,23 @@ def main_func(board_size = 8, elements_max=None):
             'time_exec': '{:.3g}'.format(time_exec)}
 
     print(len_board)
-#TODO: inserting data to files during recurtion. goriz and vertic - to files?
+#TODO: inserting data to files during recurtion. horizontal and vertical - to files?
 
 if __name__ == '__main__':
     import timeit
     from tools_my import convert_to_exponent_float
-    board_size = 4
-    vertic = [str(v) for v in range(board_size - 1, -1, -1)]
-    board = [v + ':' + g for v in vertic for g in goriz]
+    board_size = 1000
+    vertical = [str(v) for v in range(board_size - 1, -1, -1)]
+    # board = [v + ':' + g for v in vertical for g in horizontal]
     elements_max = None
     # time_total = timeit.timeit('board_func({}, {})'.format(board_size, elements_max), setup='from __main__ import board_func', number=1)
     # time_creating_element = time_total / (board_size * board_size)
     d = main_func(board_size, elements_max)
     width = 30
     format_my = '{0:{1}}: {2}'
+    # for k in range(board_size - 1, -1, -1):
+    #     with open('./board/{}.pkl'.format(k), 'rb') as file_my:
+    #         print(pickle.load(file_my))
     print(format_my.format('time_func_board', width, convert_to_exponent_float(d['time_func_board'], digit=0)),
           format_my.format('time_creating_element', width, convert_to_exponent_float(d['time_creating_element'])),
           sep='\n')
-    # for k in range(size_max - 1, -1, -1):
-    #     with open('./board/board{}.pkl'.format(k), 'rb') as file_my:
-    #         print(pickle.load(file_my))
