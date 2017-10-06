@@ -3,8 +3,8 @@ from time import time
 import os
 import glob
 
-horizontal = []
-vertical = []
+horizontal, vertical, points_tuple_set = [], [], set()
+calls = 0
 
 def bord_create_func(board_size=10000):
     """
@@ -15,23 +15,16 @@ def bord_create_func(board_size=10000):
     """
     global horizontal
 
-
     vertical = [str(v) for v in range(board_size - 1, -1 , -1)]
     horizontal = [str(h) for h in range(board_size)]
-
     board = [h + ':' + v for v in vertical for h in horizontal]
 
     return board
-
-
-
 
 def fields_rest_func(field, fields_set):
     """ Creates new rest list of free fields for the given field.  Finds diagonal, vertical and horizontal fields
         binded with this field and subtracts them from the input board_rest_set """
     horizontal_value, sep, vertical_value   = field.partition(':')
-    # print(field, vertical_value, horizontal_value)
-
     horizontal_point = int(horizontal_value)
     vertical_point = board_size - 1 - int(vertical_value)
 
@@ -39,9 +32,7 @@ def fields_rest_func(field, fields_set):
     horizontal_right = horizontal[horizontal_point + 1:]
     vertical_down = vertical[vertical_point + 1:]
     vertical_up = vertical[:vertical_point]
-
     fields_vertical_list = [horizontal_value + ':' + v for v in vertical if v != vertical_value]
-
     fields_horizontal_list = [h + ':' + vertical_value for h in horizontal if h != horizontal_value]
 
     diagonal_left_down = list(h + ':' + v for (v, h) in zip(vertical_down, reversed(horizontal_left)))
@@ -51,11 +42,9 @@ def fields_rest_func(field, fields_set):
 
     total_fields_list = (diagonal_rigt_down + diagonal_left_down + diagonal_rigt_up + diagonal_left_up +
                          fields_vertical_list + fields_horizontal_list + [field])
-
     fields_rest_set = fields_set.difference(set(total_fields_list))
 
     return fields_rest_set
-points_tuple_set = set()
 
 def point_func(fields_set, points_list=[], level=0):
     """
@@ -86,29 +75,12 @@ def point_func(fields_set, points_list=[], level=0):
 
     return
 
-'''
-        
-
-           
-
-            
-
-                # points_tuple_list = sorted(
-                #     list(set(tuple(sorted(points_list)) for points_list in points_list_list)))
-
-                # print( points_tuple_list)
-                # return points_list_list
-'''
-calls = 0
 def main_func(board_size = 8, elements_max=None):
 
     start = time()
     board = bord_create_func(board_size)
     time_func_board = time() - start
-    # return
     point_func(set(board), level=0)
-
-
 
     time_func_point = time() - time_func_board
     time_exec = time() - start
@@ -120,21 +92,13 @@ def main_func(board_size = 8, elements_max=None):
             'time_exec': '{:.3g}'.format(time_exec)}
 
 
-#TODO: inserting data to files during recurtion. horizontal and vertical - to files?
-
 if __name__ == '__main__':
-    import timeit
     from tools_my import convert_to_exponent_float
     board_size = 5
     elements_max = None
-    # time_total = timeit.timeit('board_func({}, {})'.format(board_size, elements_max), setup='from __main__ import board_func', number=1)
-    # time_creating_element = time_total / (board_size * board_size)
     d = main_func(board_size, elements_max)
     width = 30
     format_my = '{0:{1}}: {2}'
-    # for k in range(board_size - 1, -1, -1):
-    #     with open('./board/{}.pkl'.format(k), 'rb') as file_my:
-    #         print(pickle.load(file_my))
     print(format_my.format('time_func_board', width, convert_to_exponent_float(d['time_func_board'], digit=0)),
           format_my.format('time_creating_element', width, convert_to_exponent_float(d['time_creating_element'])),
           format_my.format('time_execution', width, d['time_exec']),
